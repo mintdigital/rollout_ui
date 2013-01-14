@@ -14,16 +14,18 @@ module RolloutUi
     end
 
     def add_feature(feature)
-      redis.sadd(:features, feature)
+      # take advantage of Rollout behavior: deactivating a non-existence feature
+      # creates it within Rollout.features
+      rollout.deactivate(feature)
     end
 
     def features
-      features = redis.smembers(:features)
+      features = rollout.features.uniq
       features ? features.sort : []
     end
 
     def redis
-      rollout.instance_variable_get("@redis")
+      rollout.instance_variable_get("@storage")
     end
   end
 end
