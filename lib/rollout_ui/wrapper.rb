@@ -14,9 +14,7 @@ module RolloutUi
     end
 
     def add_feature(feature)
-      # take advantage of Rollout behavior: deactivating a non-existence feature
-      # creates it within Rollout.features
-      rollout.deactivate(feature)
+      rollout.send(:save, rollout.get(feature))
     end
 
     def features
