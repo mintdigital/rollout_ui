@@ -23,13 +23,13 @@ describe RolloutUi::Wrapper do
     it "returns all groups defined for the rollout instance" do
       $rollout.define_group(:beta_testers) { |user| user.beta_tester? }
 
-      @rollout_ui.groups.should == ["all", "beta_testers"]
+      @rollout_ui.groups.should == [:all, :beta_testers]
     end
 
     it "doesn't return other defined groups" do
       Rollout.new($redis).define_group(:beta_testers) { |user| user.beta_tester? }
 
-      @rollout_ui.groups.should == ["all"]
+      @rollout_ui.groups.should == [:all]
     end
   end
 
@@ -42,14 +42,14 @@ describe RolloutUi::Wrapper do
       $rollout.active?(:featureA, mock(:user, :id => 5))
       $rollout.active?(:featureB, mock(:user, :id => 6))
 
-      @rollout_ui.features.should == ["featureA", "featureB"]
+      @rollout_ui.features.should == [:featureA, :featureB]
     end
 
     it "lists each feature only once" do
       $rollout.active?(:featureA, mock(:user, :id => 5))
       $rollout.active?(:featureA, mock(:user, :id => 6))
 
-      @rollout_ui.features.should == ["featureA"]
+      @rollout_ui.features.should == [:featureA]
     end
 
     it "lists features in alphabetical order" do
@@ -58,7 +58,7 @@ describe RolloutUi::Wrapper do
       $rollout.active?(:featureB, mock(:user, :id => 6))
       $rollout.active?(:anotherFeature, mock(:user, :id => 8))
 
-      @rollout_ui.features.should == %w(anotherFeature featureA featureB zFeature)
+      @rollout_ui.features.should == %w(anotherFeature featureA featureB zFeature).map(&:to_sym)
     end
   end
 
@@ -66,7 +66,24 @@ describe RolloutUi::Wrapper do
     it "adds feature to the list of features" do
       @rollout_ui.add_feature(:featureA)
 
-      @rollout_ui.features.should == ["featureA"]
+      @rollout_ui.features.should == [:featureA]
+    end
+  end
+
+  describe "#active?" do
+    let(:chat_user)     { mock(:user, :id => 1) }
+    let(:non_chat_user) { mock(:user, :id => 2) }
+
+    before do
+      $rollout.activate_user(:chat, mock(:user, :id => 1))
+    end
+
+    it "chat is active for chat_user" do
+      $rollout.active?(:chat, chat_user).should be_true
+    end
+
+    it "chat is not active for non_chat_user" do
+      $rollout.active?(:chat, non_chat_user).should be_false
     end
   end
 end
