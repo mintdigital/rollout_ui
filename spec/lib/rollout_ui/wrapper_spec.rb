@@ -39,24 +39,24 @@ describe RolloutUi::Wrapper do
     end
 
     it "returns all features that have been requested" do
-      $rollout.active?(:featureA, mock(:user, :id => 5))
-      $rollout.active?(:featureB, mock(:user, :id => 6))
+      $rollout.activate_user(:featureA, mock(:user, :id => 5))
+      $rollout.activate_user(:featureB, mock(:user, :id => 6))
 
       @rollout_ui.features.should == [:featureA, :featureB]
     end
 
     it "lists each feature only once" do
-      $rollout.active?(:featureA, mock(:user, :id => 5))
-      $rollout.active?(:featureA, mock(:user, :id => 6))
+      $rollout.activate_user(:featureA, mock(:user, :id => 5))
+      $rollout.activate_user(:featureA, mock(:user, :id => 6))
 
       @rollout_ui.features.should == [:featureA]
     end
 
     it "lists features in alphabetical order" do
-      $rollout.active?(:zFeature, mock(:user, :id => 1))
-      $rollout.active?(:featureA, mock(:user, :id => 5))
-      $rollout.active?(:featureB, mock(:user, :id => 6))
-      $rollout.active?(:anotherFeature, mock(:user, :id => 8))
+      $rollout.activate_user(:zFeature, mock(:user, :id => 1))
+      $rollout.activate_user(:featureA, mock(:user, :id => 5))
+      $rollout.activate_user(:featureB, mock(:user, :id => 6))
+      $rollout.activate_user(:anotherFeature, mock(:user, :id => 8))
 
       @rollout_ui.features.should == %w(anotherFeature featureA featureB zFeature).map(&:to_sym)
     end
